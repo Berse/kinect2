@@ -20,9 +20,6 @@ namespace FaceNSkinWPF
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        /// Constant for clamping Z values of camera space points from being negative
-        private const float InferredZPositionClamp = 0.1f;
-
         private KinectSensor m_kinectSensor = null;
         private BodyFrameReader m_bodyReader;
         private Body[] m_bodies = null;
@@ -73,9 +70,9 @@ namespace FaceNSkinWPF
                     // those body objects will be re-used.
                     _bodyFrame.GetAndRefreshBodyData(this.m_bodies);
                     Msg(String.Format("BodyReader_FrameArrived: {0}", e.FrameReference.RelativeTime.ToString()));
+                    BodyDrawHelper.DrawSkeletalBodies(m_drawingGroup, m_bodies, this.m_DisplayHeight, this.m_DisplayWidth, m_coordinateMapper);
                     _datareceived = true;
                 } // if
-                if (_datareceived) DrawSkeletalBodies();
             } // using
         }
 
@@ -87,6 +84,7 @@ namespace FaceNSkinWPF
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // nothing
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -135,52 +133,7 @@ namespace FaceNSkinWPF
             TextBlock_RawStatus.Text = _sb.ToString();
         }
 
-        private void DrawSkeletalBodies()
-        {
-                using (DrawingContext _dc = this.m_drawingGroup.Open())
-                {
-                    // Draw a transparent background to set the render size
-                    _dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.m_DisplayWidth, this.m_DisplayHeight));
-
-                    int penIndex = 0;
-                    foreach (Body _body in this.m_bodies)
-                    {
-                        Pen drawPen = BodyColors.GetColorAt(penIndex++);
-                        if (_body.IsTracked)
-                        {
-                            BodyDrawHelper.DrawClippedEdges(_body, _dc, this.m_DisplayHeight, this.m_DisplayWidth );
-
-                            IReadOnlyDictionary<JointType, Joint> joints = _body.Joints;
-
-                            // convert the joint points to depth (display) space
-                            Dictionary<JointType, Point> _jointPoints = new Dictionary<JointType, Point>();
-
-                            foreach (JointType jointType in joints.Keys)
-                            {
-                                // sometimes the depth(Z) of an inferred joint may show as negative
-                                // clamp down to 0.1f to prevent coordinatemapper from returning (-Infinity, -Infinity)
-                                CameraSpacePoint position = joints[jointType].Position;
-                                if (position.Z < 0)
-                                {
-                                    position.Z = InferredZPositionClamp;
-                                }
-
-                                DepthSpacePoint depthSpacePoint = this.m_coordinateMapper.MapCameraPointToDepthSpace(position);
-                                _jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-                            }
-
-                            BodyDrawHelper.DrawBody(joints, _jointPoints, _dc, drawPen);
-
-                            BodyDrawHelper.DrawHand(_body.HandLeftState, _jointPoints[JointType.HandLeft], _dc);
-                            BodyDrawHelper.DrawHand(_body.HandRightState, _jointPoints[JointType.HandRight], _dc);
-                        }
-                    }
-
-                    // prevent drawing outside of our render area
-                    this.m_drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, m_DisplayWidth, m_DisplayHeight));
-                }
-            } // DrawBodies function
-
+ 
             public event PropertyChangedEventHandler PropertyChanged;
 
             /// <summary>

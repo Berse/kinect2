@@ -10,6 +10,8 @@ namespace FaceNSkinWPF
         public static double ClipBoundsThickness = 10;
         public static double HandSize = 30;
         public static Pen InferredBonePen = new Pen(Brushes.Gray, 1);
+        /// Constant for clamping Z values of camera space points from being negative
+        public static float InferredZPositionClamp = 0.1f;
         public static double JointThickness = 3;
 
         /// Brush used for drawing hands that are currently tracked as closed
@@ -160,7 +162,53 @@ namespace FaceNSkinWPF
             } //switch
         }//drawhand
 
+        // could have a DrawSkeletalBodiesParamsStruct to bundle these
+        public static void DrawSkeletalBodies( 
+            DrawingGroup dg , Body[] bodies, int DisplayWidth, int DisplayHeight, CoordinateMapper coordmapper )
+        {
+            using (DrawingContext _dc = dg.Open())
+            {
+                // Draw a transparent background to set the render size
+                _dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, DisplayWidth, DisplayHeight));
 
+                int penIndex = 0;
+                foreach (Body _body in bodies)
+                {
+                    Pen drawPen = BodyColors.GetColorAt(penIndex++);
+                    if (_body.IsTracked)
+                    {
+                        BodyDrawHelper.DrawClippedEdges(_body, _dc, DisplayHeight, DisplayWidth);
+
+                        IReadOnlyDictionary<JointType, Joint> joints = _body.Joints;
+
+                        // convert the joint points to depth (display) space
+                        Dictionary<JointType, Point> _jointPoints = new Dictionary<JointType, Point>();
+
+                        foreach (JointType jointType in joints.Keys)
+                        {
+                            // sometimes the depth(Z) of an inferred joint may show as negative
+                            // clamp down to 0.1f to prevent coordinatemapper from returning (-Infinity, -Infinity)
+                            CameraSpacePoint position = joints[jointType].Position;
+                            if (position.Z < 0)
+                            {
+                                position.Z = InferredZPositionClamp;
+                            }
+
+                            DepthSpacePoint depthSpacePoint = coordmapper.MapCameraPointToDepthSpace(position);
+                            _jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
+                        }
+
+                        BodyDrawHelper.DrawBody(joints, _jointPoints, _dc, drawPen);
+
+                        BodyDrawHelper.DrawHand(_body.HandLeftState, _jointPoints[JointType.HandLeft], _dc);
+                        BodyDrawHelper.DrawHand(_body.HandRightState, _jointPoints[JointType.HandRight], _dc);
+                    }
+                }
+
+                // prevent drawing outside of our render area
+                dg.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, DisplayWidth, DisplayHeight));
+            }
+        } // DrawBodies function
 
     }
 }
