@@ -1,10 +1,19 @@
-﻿using System;
-using Microsoft.Kinect;
-
+﻿// CONTACT
+// Joe Healy // josephehealy@hotmail.com
+//
+// CREDITS
 // ported from a Kinect SDK 1.8 project at // http://studentguru.gr/b/vangos/archive/2012/05/07/kinect-for-windows-find-user-height-accurately
 // codeproject is at http://www.codeproject.com/Tips/380152/Kinect-for-Windows-Find-User-Height-Accurately
-// Skeleton is now Bones
+//
+// MIT License
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associateddocumentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: 
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. 
+// THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+//
+using System;
+using Microsoft.Kinect;
 
+// Skeleton is now Bones
 public enum BodyHeightMeasurementSystem
 {
     Meters = 0, Imperial = 1
