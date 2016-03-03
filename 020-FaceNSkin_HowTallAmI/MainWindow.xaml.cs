@@ -69,6 +69,7 @@ namespace FaceNSkinWPF
                     _bodyFrame.GetAndRefreshBodyData(this.m_bodies);
                     Msg(String.Format("BodyReader_FrameArrived: {0}", e.FrameReference.RelativeTime.ToString()));
                     BodyDrawHelper.DrawSkeletalBodies(m_drawingGroup, m_bodies, this.m_DisplayHeight, this.m_DisplayWidth, m_coordinateMapper);
+                    ShowBodyHeights();
                 } // if
             } // using
         }
@@ -129,8 +130,33 @@ namespace FaceNSkinWPF
 
             TextBlock_RawStatus.Text = _sb.ToString();
         }
- 
-            public event PropertyChangedEventHandler PropertyChanged;
+        private void ShowBodyHeights()
+        {
+            double _h0 = m_bodies[0].Height();
+            double _h1 = m_bodies[1].Height();
+            double _h2 = m_bodies[2].Height();
+            double _h3 = m_bodies[3].Height();
+            double _h4 = m_bodies[4].Height();
+            double _h5 = m_bodies[5].Height();
+
+            // switch between meters and feet for display
+            // BodyHeightExtension.MeasurementSystem = BodyHeightMeasurementSystem.Meters;
+            BodyHeightExtension.MeasurementSystem = BodyHeightMeasurementSystem.Imperial;
+
+            string _retval;
+            if ( BodyHeightExtension.MeasurementSystem == BodyHeightMeasurementSystem.Meters )
+            { 
+                _retval = String.Format("body heights: #0[{0:0.0#}m] #1[{1:0.0#}m] #2[{2:0.0#}m] #3[{3:0.0#}m] #4[{4:0.0#}m] #5[{5:0.0#}m]",
+                    _h0, _h1, _h2, _h3, _h4, _h5 );
+            }
+            else
+            {
+                _retval = String.Format("body heights: #0[{0:0.0#}f] #1[{1:0.0#}f] #2[{2:0.0#}f] #3[{3:0.0#}f] #4[{4:0.0f}f] #5[{5:0.0#}f]",
+                    _h0, _h1, _h2, _h3, _h4, _h5);
+            }
+            TextBlock_BodyHeights.Text = _retval;
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
             /// <summary>
             /// Gets the bitmap to display

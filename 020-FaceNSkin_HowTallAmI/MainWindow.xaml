@@ -26,8 +26,9 @@
         </Viewbox>
         <StackPanel Grid.Row="2" Orientation="Vertical">
             <TextBlock x:Name="TextBlock_StatusBar" Height="20" Foreground="Black" FontWeight="Bold" Text="e.IsAvailable: unknown"/>
-            <TextBlock x:Name="TextBlock_RawStatus" Height="20" Foreground="Black" FontWeight="Bold" Text="k2 raw status"/>
-            <TextBlock x:Name="TextBlock_Msg" Height="20" Foreground="Blue" FontWeight="Bold" Text="ready"/>
+            <TextBlock x:Name="TextBlock_RawStatus" Height="20" Foreground="Blue" FontWeight="Bold" Text="k2 raw status"/>
+            <TextBlock x:Name="TextBlock_Msg" Height="20" Foreground="Black" FontWeight="Bold" Text="ready"/>
+            <TextBlock x:Name="TextBlock_BodyHeights" Height="20" Foreground="Blue" FontWeight="Bold" Text="body heights go here"/>
         </StackPanel>
     </Grid>
 </Window>

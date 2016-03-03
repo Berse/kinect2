@@ -5,11 +5,30 @@ using Microsoft.Kinect;
 // codeproject is at http://www.codeproject.com/Tips/380152/Kinect-for-Windows-Find-User-Height-Accurately
 // Skeleton is now Bones
 
+public enum BodyHeightMeasurementSystem
+{
+    Meters = 0, Imperial = 1
+}
 
 public static class BodyHeightExtension
 {
+    // change this to change the way values are returned, by default everything is meters
+    public static BodyHeightMeasurementSystem MeasurementSystem = BodyHeightMeasurementSystem.Meters;
+
+    /// <summary>
+    /// Get Height of a body in CM
+    /// </summary>
+    /// <param name="TargetBody">used for extension method purposes - uses should not see</param>
+    /// <returns>
+    /// positive value: height in meters
+    /// -1.0 : null body passed in
+    /// -2.0 : body not tracked, no height available
+    /// </returns>
     public static double Height( this Body TargetBody )
     {
+        if ( TargetBody == null ) return -1.0;
+        if (TargetBody.IsTracked == false) return -2.0;
+
         const double HEAD_DIVERGENCE = 0.1;
 
         Joint _head = TargetBody.Joints[JointType.Head];
@@ -36,7 +55,11 @@ public static class BodyHeightExtension
         double legLength = legLeftTrackedJoints > legRightTrackedJoints ? Length(_hipLeft, _kneeLeft, _ankleLeft, _footLeft) 
             : Length(_hipRight, _kneeRight, _ankleRight, _footRight);
 
-        return Length(_head, _neck, _spine, _waist) + legLength + HEAD_DIVERGENCE;
+        // default is meters.  adjust if imperial to feet
+        double _retval = Length(_head, _neck, _spine, _waist) + legLength + HEAD_DIVERGENCE;
+        if (MeasurementSystem == BodyHeightMeasurementSystem.Imperial) _retval = MetricHelpers.MetersToFeet(_retval);
+
+        return _retval;
     }
 
     /// <summary>

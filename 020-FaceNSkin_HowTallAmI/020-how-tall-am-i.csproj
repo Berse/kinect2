@@ -68,6 +68,7 @@
     <Compile Include="helpers\Bones.cs" />
     <Compile Include="helpers\BodyDrawHelper.cs" />
     <Compile Include="helpers\BodyHeight.cs" />
+    <Compile Include="helpers\MetricHelper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
