@@ -6,14 +6,9 @@ using Microsoft.Kinect;
 // Skeleton is now Bones
 
 
-public class BodyHeightHelper
+public static class BodyHeightExtension
 {
-    public Body TargetBody { get; set; }
-    public BodyHeightHelper( Body body )
-    {
-        TargetBody = body;
-    }
-    public double Height()
+    public static double Height( this Body TargetBody )
     {
         const double HEAD_DIVERGENCE = 0.1;
 
@@ -49,7 +44,7 @@ public class BodyHeightHelper
     /// </summary>
     /// <param name="skeleton">The specified user skeleton.</param>
     /// <returns>The upper height of the skeleton in meters.</returns>
-    public double UpperHeight()
+    public static double UpperHeight( this Body TargetBody )
     {
         Joint _head = TargetBody.Joints[JointType.Head];
         // used to be ShoulderCenter. Think its SpineMid now
@@ -141,7 +136,7 @@ public class BodyHeightHelper
     /// <param name="width">Width.</param>
     /// <param name="height">Height.</param>
     /// <returns>The scaled version of the joint.</returns>
-    public Joint ScaleTo(Joint joint, int width, int height)
+    public static Joint ScaleTo(Joint joint, int width, int height)
     {
         return ScaleTo(joint, width, height, 1.0f, 1.0f);
     }
